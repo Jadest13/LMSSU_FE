@@ -25,6 +25,8 @@ export default function Login() {
   const [loginSubmit, setLoginSubmit] = useState(0)
   const [signUpSubmit, setSignUpSubmit] = useState(0)
   const [signUpMode, setSignUpMode] = useState(0)
+  const [selectedCollege, setSelectedCollege] = useState(0)
+  const [selectedDepart, setSelectedDepart] = useState(0)
   
   const [values, setValues] = useState({
     stdid: "",

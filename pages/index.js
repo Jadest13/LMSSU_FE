@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import headerstyles from '../styles/Header.module.css'
@@ -75,9 +76,9 @@ export default function Home() {
         <nav role="navigation">
           <div className={headerstyles.container}>
 
-            <a className={headerstyles.logo} href="/">
+            <Link className={headerstyles.logo} href="/">
               <img src="https://class.ssu.ac.kr/customs/main/header_logo.png?v=123213"/>
-            </a>
+            </Link>
 
             <div className={headerstyles.div_grow}></div>
 
