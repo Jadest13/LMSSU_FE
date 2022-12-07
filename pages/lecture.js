@@ -80,6 +80,7 @@ export default function Lecture() {
   }
 
   const getLectureTodoLists = (item) => {
+    //weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO = ["asdasd"]
     let todoList = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO.map((subject, idx) => 
       <div key={"lectureTodoList"+idx} className={lecturestyles.lecture_todolist_content}>
         <input className={lecturestyles.lecture_todolist_check} type="checkbox" name="check" id="GFG" value="1" defaultChecked />
@@ -87,7 +88,7 @@ export default function Lecture() {
           <h4>{subject}</h4>
           <hr/>
         </div>
-        <img src="images/trash.png" onClick={deleteTodo(idx)}></img>
+        <img src="images/trash.png" onClick={deleteTodo(idx)}/>
       </div>
     );
     if(todoList.length == 0) {

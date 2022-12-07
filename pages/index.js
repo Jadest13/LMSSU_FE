@@ -100,23 +100,16 @@ export default function Home() {
 
   const getUserData = async (stdid, pwd) => {
     console.log(stdid, pwd)
-    await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-in", {
-      studentId: stdid,
-      userId: stdid,
-      pwd: pwd
-    }, {
-      withCredentials: true
-    }).then((response) => {
+    await axios.get(
+      process.env.FRONT_BASE_URL+"/backapi/student/student-info?studentId="+stdid
+    ).then((response) => {
       console.log("asd", response)
       console.log(response.data.student)
-      if(response.data.student == 'new') {
-        window.location.href=process.env.FRONT_BASE_URL+'/login';
-      }
       setUserData({
         ...userData,
-        major: response.data.major,
+        major: response.data.majorName,
         name: response.data.name,
-        status: response.data.student,
+        status: "ok",
       })
     }).catch((error) => {
       console.log(error.response)
@@ -130,7 +123,7 @@ export default function Home() {
 
   const getUserDataComponent = useCallback(() => {
     console.log(userData)
-    if(userData.status != "original") {
+    if(userData.status != "ok") {
       return ("");
     } else {
       return (
@@ -144,7 +137,7 @@ export default function Home() {
   }, [userData])
 
   const getMainBoard = useCallback(() => {
-    if(userData.status != "original") {
+    if(userData.status != "ok") {
       if(userData.status == "error") {
         window.location.href=process.env.FRONT_BASE_URL+'/login';
       }
@@ -153,9 +146,9 @@ export default function Home() {
       return (
         <div className={styles.main_board}>
           <div className={styles.board_left}>
-            {/* <iframe src={"/calendar?stdid="+stdid+"&pwd="+pwd} id="calendarBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+            <iframe src={"/calendar?stdid="+stdid+"&pwd="+pwd} id="calendarBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
             <iframe src={"/subject?stdid="+stdid+"&pwd="+pwd} id="subjectBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
-            <iframe src={"/notice?stdid="+stdid+"&pwd="+pwd} id="noticeBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" /> */}
+            <iframe src={"/notice?stdid="+stdid+"&pwd="+pwd} id="noticeBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
           </div>
           <div className={styles.board_right}>
             <iframe src={"/lecture?stdid="+stdid+"&pwd="+pwd} id="lectureBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />

@@ -116,6 +116,10 @@
   align-items: center;
 }
 
+.lecture_todolist_content > img {
+  background-color: #009bcb;
+}
+
 .lecture_todolist_check {
   width: 1.5rem;
   height: 1.5rem;
