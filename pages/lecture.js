@@ -21,6 +21,7 @@ export default function Lecture() {
     stdid: "",
     pwd: "",
   })
+  let listLoading = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -117,6 +118,9 @@ export default function Lecture() {
       let tmpList = weeklySubjectList.slice()
       console.log(stdid, pwd)
       axios.defaults.withCredentials = true;
+      if(listLoading[selectedWeeks-1] == 1) return;
+      listLoading[selectedWeeks-1] = 1;
+      console.log("LETSGO")
       await axios.post(REQ_URL, {
         studentId: stdid,
         userId: 0,
@@ -127,9 +131,12 @@ export default function Lecture() {
         data = response.data
         tmpList[selectedWeeks] = data
         weeklySubjectList[selectedWeeks] = tmpList[selectedWeeks]
+        listLoading[selectedWeeks-1] = 2;
         console.log(tmpList)
       }).catch((error) => {
         console.log(error.response)
+        
+        if(listLoading[selectedWeeks-1] == 1) listLoading[selectedWeeks-1] = 0;
         errcnt++
         if(errcnt >= 3) {
           window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
