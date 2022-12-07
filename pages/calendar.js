@@ -94,6 +94,7 @@ export default function Calendar() {
     stdid: "",
     pwd: "",
   })
+  const [openingScheduleWindow, setOpeningScheduleWindow] = useState(0);
 
   const dateTotalCount = new Date(selectedYear, selectedMonth, 0).getDate(); //선택된 연도, 달의 마지막 날짜
 
@@ -114,15 +115,27 @@ export default function Calendar() {
 
   useEffect(() => {
     const slideHeight = slideRef && slideRef.current && slideRef.current.offsetHeight;
-    if (typeof window !== "undefined")
+    if (typeof window !== "undefined") {
       window.parent.postMessage({ head: "changeHeight", body: {view: "Calendar", height: slideHeight } }, '*');
+      window.addEventListener("message", (e) => {
+        if (e.data) {
+          if(e.data.head === "rerenderPage") {
+            if(e.data.body === "OK") {
+              if(openingScheduleWindow == 0) {
+                setOpeningScheduleWindow(1);
+                getCalendarList()
+              }
+            }
+          }
+        }
+      })
+    }
   });
   
   const getCalendarList = () => {
     const getApi = async () => {
       const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/calendar?studentId="+stdid
       let data
-      console.log(REQ_URL)
       
       await axios.get(
         REQ_URL

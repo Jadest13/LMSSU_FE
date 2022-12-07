@@ -87,6 +87,8 @@ export default function Home() {
     }).catch((error) => {
       console.log(error.response)
     });
+
+    sendToCalendar()
   }
 
   const showSchedule = (data) => {
@@ -212,6 +214,10 @@ export default function Home() {
   }, [userData])
 
   const [selectedDateAddSchedule, setSelectedDateAddSchedule] = useState(1)
+
+  const sendToCalendar = () => {
+    document.getElementById('calendarBoard').contentWindow.postMessage({ head: "rerenderPage", body: 'OK' });
+  }
 
   const changeSelectedDateAddSchedule = (e) => {
     setSelectedDateAddSchedule(Number(e.target.value));
@@ -357,6 +363,8 @@ export default function Home() {
       console.log(error.response)
       alert("ERROR!")
     });
+    
+    sendToCalendar()
   }
 
   const openScheduleShowWindow = useCallback(() => {
