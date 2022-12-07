@@ -87,8 +87,11 @@ export default function Calendar() {
   let now = new Date();
   const [selectedYear, setSelectedYear] = useState(now.getFullYear()); //현재 선택된 연도
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth()+1); //현재 선택된 달
-
   const [calendarList, setCalendarList] = useState([]);
+  const [userData, setUserData] = useState({
+    stdid: "",
+    pwd: "",
+  })
 
   const dateTotalCount = new Date(selectedYear, selectedMonth, 0).getDate(); //선택된 연도, 달의 마지막 날짜
 
@@ -207,7 +210,7 @@ export default function Calendar() {
         </tbody>
       </table>
     )
-  }, [selectedYear, selectedMonth, dateTotalCount, calendarList]);
+  }, [selectedYear, selectedMonth, dateTotalCount, calendarList, userData]);
 
   return (
     <div ref={slideRef}>

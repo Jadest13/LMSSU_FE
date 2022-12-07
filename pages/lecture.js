@@ -200,6 +200,8 @@ export default function Lecture() {
       getLectureItems();
     }
 
+    if(userData)
+
     return (
       <div className={lecturestyles.lecture_board}>
         <div className={lecturestyles.lecture_week}>
@@ -213,7 +215,7 @@ export default function Lecture() {
         {getLectureItemsComponent()}
       </div>
     )
-  }, [selectedWeeks])
+  }, [selectedWeeks, userData])
 
   return (
     <div ref={slideRef}>
