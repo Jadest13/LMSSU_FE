@@ -1,0 +1,107 @@
+
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20rem;
+}
+
+.square {
+  border:0;
+  width:80px;
+  padding:0px;
+}
+
+.spin {
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  border:dashed 5px #92e6ff;
+  animation-name: spin;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  -webkit-animation-name: spin;
+  -webkit-animation-duration: 1.5s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+}
+
+@keyframes spin {
+  from   {  -webkit-transform: rotate(0deg); }
+  to   {  -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  from   {  -webkit-transform: rotate(0deg); }
+  to   {  -webkit-transform: rotate(360deg); }
+}
+
+
+
+
+.clock{
+  border-radius: 10rem;
+  border: 0.5rem solid #92e6ff;
+  height: 10rem;
+  width: 10rem;
+  position: relative;
+}
+.clock:after{
+  content: "";
+  position: absolute;
+  background-color: #92e6ff;
+  height: 4.25rem;
+  width: 0.5rem;
+  top: 0.25rem;
+  left: 4.25rem;
+  border-radius: 1rem;
+  -webkit-transform-origin: 50% 97%;
+      transform-origin: 50% 97%;
+  -webkit-animation: grdAiguille 2s linear infinite;
+      animation: grdAiguille 2s linear infinite;
+}
+
+@-webkit-keyframes grdAiguille{
+    0%{-webkit-transform:rotate(0deg);}
+    100%{-webkit-transform:rotate(360deg);}
+}
+
+@keyframes grdAiguille{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+.clock:before{
+  content: "";
+  position: absolute;
+  background-color: #92e6ff;
+  height: 3.25rem;
+  width: 0.5rem;
+  top: 1.375rem;
+  left: 4.25rem;
+  border-radius: 1rem;
+  -webkit-transform-origin: 50% 94%;
+      transform-origin: 50% 94%;
+  -webkit-animation: ptAiguille 12s linear infinite;
+      animation: ptAiguille 12s linear infinite;
+}
+
+@-webkit-keyframes ptAiguille{
+    0%{
+      -webkit-transform:rotate(0deg);
+    }
+
+    100%{
+      -webkit-transform:rotate(360deg);
+    }
+}
+
+@keyframes ptAiguille{
+    0%{
+      transform:rotate(0deg);
+    }
+
+    100%{
+      transform:rotate(360deg);
+    }
+}

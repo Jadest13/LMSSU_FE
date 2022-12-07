@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import noticestyles from '../styles/Notice.module.css'
+import loadingstyles from '../styles/Loading.module.css'
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
 import axios from 'axios'
 
@@ -36,7 +37,6 @@ export default function Notice() {
 
   useEffect(() => {
     const slideHeight = slideRef && slideRef.current && slideRef.current.offsetHeight;
-    console.log(slideHeight)
     window.parent.postMessage({ head: "changeHeight", body: {view: "Notice", height: slideHeight } }, '*');
   })
 
@@ -65,7 +65,8 @@ export default function Notice() {
         console.log(error.response)
         errcnt++
         if(errcnt >= 3) {
-          window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
+          if (typeof window !== "undefined")
+            window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
         }
       })
       setSelectedNoticeList(tmpList)
@@ -164,7 +165,11 @@ export default function Notice() {
     let noticeListComponent;
     if(selectedNotice >= selectedNoticeList.length || selectedPage > selectedNoticeList[selectedNotice].length) {
       noticeListComponent = (
-        <div className={noticestyles.notice_content_loading}>{selectedNotice}asdasd{selectedPage}</div>
+        <div className={loadingstyles.main}>
+          <div className={loadingstyles.square}>
+            <div className={loadingstyles.spin}></div>
+          </div>
+        </div>
       )
     } else {
       noticeListComponent = selectedNoticeList[selectedNotice][selectedPage-1].map((name, idx) => 

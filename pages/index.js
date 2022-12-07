@@ -51,19 +51,6 @@ const changeHeight = (obj) => {
     view.style.height = obj.height + "px";
   }
 }
-
-const GetMessage = () => {
-  useEffect(() => {
-    window.addEventListener("message", (e) => {
-      if (e.data) {
-        if(e.data.head === "changeHeight") {
-          changeHeight(e.data.body);
-        }
-      }
-    }, false);
-  }, []);
-}
-
 export default function Home() {
 
   const [userData, setUserData] = useState({
@@ -73,7 +60,66 @@ export default function Home() {
     major: "",
     status: ""
   })
+  const [scheduleWindowInfo, setScheduleWindowInfo] = useState({
+    year: "",
+    month: "",
+    subject: []
+  })
+  const [scheduleWindowShowInfo, setScheduleWindowShowInfo] = useState({
+    year: "",
+    month: "",
+    day: "",
+    lectureList: [],
+    scheduleList: [],
+  })
+  const [openingScheduleWindow, setOpeningScheduleWindow] = useState(0);
   
+  const addSchedule = async (body) => {
+    await axios.get(
+      process.env.FRONT_BASE_URL+"/backapi/incomplete?studentId="+stdid
+    ).then((response) => {
+      console.log(response)
+      setScheduleWindowInfo({
+        year: body.year,
+        month: body.month,
+        subject: response.data.Results,
+      })
+    }).catch((error) => {
+      console.log(error.response)
+    });
+  }
+
+  const showSchedule = (data) => {
+    setScheduleWindowShowInfo({
+      year: data.body.year,
+      month: data.body.month,
+      day: data.body.day,
+      lectureList: data.body.lectureList,
+      scheduleList: data.body.scheduleList,
+    })
+  }
+
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      window.addEventListener("message", (e) => {
+        if (e.data) {
+          if(e.data.head === "changeHeight") {
+            changeHeight(e.data.body);
+          } else if(e.data.head === "addSchedule") {
+            if(openingScheduleWindow == 0) {
+              setOpeningScheduleWindow(1);
+              addSchedule(e.data.body);
+            }
+          } else if(e.data.head === "showSchedule") {
+            if(openingScheduleWindow == 0) {
+              setOpeningScheduleWindow(1);
+              showSchedule(e.data);
+            }
+          }
+        }
+      }, false);
+  });
+
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
 
@@ -103,10 +149,10 @@ export default function Home() {
     await axios.get(
       process.env.FRONT_BASE_URL+"/backapi/student/student-info?studentId="+stdid
     ).then((response) => {
-      console.log("asd", response)
-      console.log(response.data.student)
+      console.log(response)
       setUserData({
-        ...userData,
+        stdid: stdid,
+        pwd: pwd,
         major: response.data.majorName,
         name: response.data.name,
         status: "ok",
@@ -122,7 +168,6 @@ export default function Home() {
   }
 
   const getUserDataComponent = useCallback(() => {
-    console.log(userData)
     if(userData.status != "ok") {
       return ("");
     } else {
@@ -141,7 +186,14 @@ export default function Home() {
       if(userData.status == "error") {
         window.location.href=process.env.FRONT_BASE_URL+'/login';
       }
-      return ("");
+      return (
+        <div className={styles.loading_main}>
+          <div className={styles.loading_container}>
+            <div className={styles.loading}></div>
+            <div className={styles.loading_text}>loading</div>
+          </div>
+        </div>
+      );
     } else {
       return (
         <div className={styles.main_board}>
@@ -159,6 +211,228 @@ export default function Home() {
     
   }, [userData])
 
+  const [selectedDateAddSchedule, setSelectedDateAddSchedule] = useState(1)
+
+  const changeSelectedDateAddSchedule = (e) => {
+    setSelectedDateAddSchedule(Number(e.target.value));
+  };
+
+  const ScheduleDateSelect = useCallback(() => {
+    let month_day=[31,28,31,30,31,30,31,31,30,31,30,31]
+    
+    if (scheduleWindowInfo.year%400 == 0) {
+      month_day[1] = 29
+    } else if (scheduleWindowInfo.year%100 == 0) {
+      month_day[1] = 28
+    } else if (scheduleWindowInfo.year%4 == 0) {
+      month_day[1] = 29
+    } else {
+      month_day[1] = 28
+    }
+    
+    let DateOption = [];
+    for(let i = 1; i <= month_day[scheduleWindowInfo.month-1]; i++) {
+      DateOption.push(
+        <option key={i} value={i}>{i}</option>
+      );
+    }
+
+    return (
+      <select onChange={changeSelectedDateAddSchedule} name="date" id="addScheduleDate" value={selectedDateAddSchedule}>
+        {DateOption}
+      </select>
+    )
+  }, [selectedDateAddSchedule, scheduleWindowInfo])
+
+  const [selectedSubjectAddSchedule, setSelectedSubjectAddSchedule] = useState(1)
+
+  const changeSelectedSubjectAddSchedule = (e) => {
+    setSelectedSubjectAddSchedule(Number(e.target.value));
+  };
+
+  const ScheduleSubjectSelect= useCallback(() => {
+
+    const scheduleOption = scheduleWindowInfo.subject.map((subject, idx) => {
+      return (
+        <option key={idx} value={idx}>{subject.subjectName}</option>
+      )
+    })
+
+    return (
+      <select onChange={changeSelectedSubjectAddSchedule} name="date" id="addScheduleDate" value={selectedSubjectAddSchedule}>
+        {scheduleOption}
+      </select>
+    )
+  }, [selectedSubjectAddSchedule, scheduleWindowInfo])
+
+  const submitAddSchedule = async () => {
+
+    const date = scheduleWindowInfo.year+"-"+('00' + scheduleWindowInfo.month).slice(-2)+"-"+('00' + selectedDateAddSchedule).slice(-2)
+    const subjectId = scheduleWindowInfo.subject[selectedSubjectAddSchedule].subjectName.slice(-11, scheduleWindowInfo.subject[selectedSubjectAddSchedule].subjectName.length-1)
+
+    await axios.post(process.env.FRONT_BASE_URL+"/backapi/calendar/exam", {
+      date: date,
+      studentId: stdid,
+      subjectId: subjectId
+    }, {
+      withCredentials: true
+    }).then((response) => {
+      console.log(response)
+      setScheduleWindowInfo({
+        year: "",
+        month: "",
+        subject: []
+      })
+      setOpeningScheduleWindow(0)
+    }).catch((error) => {
+      console.log(error.response)
+      alert("ERROR!")
+    });
+  }
+
+  const openScheduleWindow = useCallback(() => {
+    if(!scheduleWindowInfo.year || !scheduleWindowInfo.month || scheduleWindowInfo.subject.length == 0) {
+      return "";
+    } else {
+      return (
+        <div className={styles.addScheduleWindow_background}>
+          <div className={styles.addScheduleWindow}>
+            <div className={styles.addScheduleWindow_title}>
+              <div>
+                <h1>X</h1>
+                <h2>시험 일정 추가</h2>
+                <h1 onClick={() => {
+                  setScheduleWindowInfo({
+                    year: "",
+                    month: "",
+                    subject: []
+                  })
+                  setOpeningScheduleWindow(0)
+                }}>X</h1>
+              </div>
+              <hr/>
+            </div>
+            <div className={styles.addScheduleWindow_head}>
+              <div className={styles.addScheduleWindow_grow}>
+                <div>
+                  <h4>{scheduleWindowInfo.year+"."+scheduleWindowInfo.month+"."}</h4>
+                  {ScheduleDateSelect()}
+                </div>
+              </div>
+              <div className={styles.addScheduleWindow_grow}>
+                <div>
+                  <h4>과목명: </h4>
+                  {ScheduleSubjectSelect()}
+                </div>
+              </div>
+            </div>
+            <div className={styles.addScheduleWindow_body}>
+              <h3 onClick={submitAddSchedule}>추가</h3>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }, [scheduleWindowInfo, selectedDateAddSchedule, selectedSubjectAddSchedule])
+
+  const deleteScheduleItem = async (date, studentId, subjectId) => {
+    const question = confirm("일정을 삭제하시겠습니까?")
+    if(!question) return
+    await axios.post(process.env.FRONT_BASE_URL+"/backapi/calendar/exam/cancel", {
+      date: date,
+      studentId: studentId,
+      subjectId: subjectId
+    }, {
+      withCredentials: true
+    }).then((response) => {
+      console.log(response)
+      for(let i = 0; i < scheduleWindowShowInfo.scheduleList.length; i++) {
+        if(scheduleWindowShowInfo.scheduleList[i].title.slice(-11, scheduleWindowShowInfo.scheduleList[i].title.length-1) == subjectId) {
+          scheduleWindowShowInfo.scheduleList.splice(i, 1)
+          break;
+        }
+      }
+      setOpeningScheduleWindow(0)
+    }).catch((error) => {
+      console.log(error.response)
+      alert("ERROR!")
+    });
+  }
+
+  const openScheduleShowWindow = useCallback(() => {
+    console.log(scheduleWindowShowInfo)
+    if(!scheduleWindowShowInfo.year || !scheduleWindowShowInfo.month || !scheduleWindowShowInfo.day ||
+      (scheduleWindowShowInfo.lectureList.length == 0 && scheduleWindowShowInfo.scheduleList.length == 0)) {
+      return "";
+    } else {
+
+      const getLectureListComponent = () => {
+        const lectureItemComponent = scheduleWindowShowInfo.lectureList.map((lecture, idx) => {
+          return (
+            <h5 key={idx}>{"💻 "+lecture.title}</h5>
+          )
+        })
+
+        return (
+          <div className={styles.showScheduleWindow_lectureList}>
+            {lectureItemComponent}
+          </div>
+        )
+      }
+
+      const getScheduleListComponent = () => {
+        const scheduleItemComponent = scheduleWindowShowInfo.scheduleList.map((schedule, idx) => {
+          return (
+            <div key={idx}>
+              <h5>{"✨ "+schedule.title}</h5>
+              <img src="images/trash.png" onClick={() => {
+                const date = scheduleWindowShowInfo.year+"-"+('00' + scheduleWindowShowInfo.month).slice(-2)+"-"+('00' + scheduleWindowShowInfo.day).slice(-2)
+                const subjectId = schedule.title.slice(-11, schedule.title.length-1)
+                deleteScheduleItem(date, stdid, subjectId)
+              }}/>
+            </div>
+          )
+        })
+
+        return (
+          <div className={styles.showScheduleWindow_scheduleList}>
+            {scheduleItemComponent}
+          </div>
+        )
+      }
+
+      return (
+        <div className={styles.showScheduleWindow_background}>
+          <div className={styles.showScheduleWindow}>
+            <div className={styles.showScheduleWindow_title}>
+              <div>
+                <h1>X</h1>
+                <h2>{scheduleWindowShowInfo.year+"."+('00' + scheduleWindowShowInfo.month).slice(-2)+"."+('00' + scheduleWindowShowInfo.day).slice(-2)}</h2>
+                <h1 onClick={() => {
+                  setScheduleWindowShowInfo({
+                    year: "",
+                    month: "",
+                    day: "",
+                    lectureList: [],
+                    scheduleList: [],
+                  })
+                  setOpeningScheduleWindow(0)
+                }}>X</h1>
+              </div>
+            </div>
+            <div className={styles.showScheduleWindow_body}>
+              <hr/>
+              {getLectureListComponent()}
+              <hr/>
+              {getScheduleListComponent()}
+              <hr/>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }, [scheduleWindowShowInfo])
+
   return (
     <div className={styles.container}>
       <Head>
@@ -166,9 +440,10 @@ export default function Home() {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <GetMessage />
 
       <header id="header">
+        {openScheduleWindow()}
+        {openScheduleShowWindow()}
         <nav role="navigation">
           <div className={headerstyles.container}>
 

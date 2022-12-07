@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import subjectstyles from '../styles/Subject.module.css'
+import loadingstyles from '../styles/Loading.module.css'
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
 import axios from 'axios'
 
@@ -61,7 +62,11 @@ export default function Subject() {
     let subjectListComponent = []
     if(subjectShow.length == 0) {
       subjectListComponent.push(
-        <h3 key="+">asd +</h3>
+        <div key={0} className={loadingstyles.main}>
+          <div className={loadingstyles.square}>
+            <div className={loadingstyles.spin}></div>
+          </div>
+        </div>
       );
     } else {
       subjectListComponent = names.map((subject, idx1) => {

@@ -118,14 +118,42 @@
 }
 
 .calendar_date > tbody > tr > td {
-  height: 5rem;
+  height: 3.6rem;
+  flex-grow: 1;
   margin: 0;
   border: 0.1rem solid #aaaaaa;
   vertical-align: top;
+  align-items: center;
 }
 
 .calendar_date > tbody > tr > td > h6 {
+  width: 100%;
+  margin: 0.25rem;
+}
+
+.calendar_date > tbody > tr > td > div {
+  width: 4.25rem;
   margin: 0;
+  display: block;
+  height: inherit;
+  overflow-x: hidden;
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.calendar_date > tbody > tr > td > div::-webkit-scrollbar {
+  display: none;
+}
+
+.calendar_date > tbody > tr > td > div > p {
+  display: block;
+  position: inherit;
+  width: 100%;
+  margin: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 

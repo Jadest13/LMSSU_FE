@@ -1,11 +1,13 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import calendarstyles from '../styles/Calendar.module.css'
+import loadingstyles from '../styles/Loading.module.css'
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
 import axios from 'axios'
 
 let stdid, pwd;
 let errcnt = 0;
+let calendarLoad = 0;
 
 const slideRef = React.createRef();
 
@@ -112,8 +114,8 @@ export default function Calendar() {
 
   useEffect(() => {
     const slideHeight = slideRef && slideRef.current && slideRef.current.offsetHeight;
-    console.log(slideHeight)
-    window.parent.postMessage({ head: "changeHeight", body: {view: "Calendar", height: slideHeight } }, '*');
+    if (typeof window !== "undefined")
+      window.parent.postMessage({ head: "changeHeight", body: {view: "Calendar", height: slideHeight } }, '*');
   });
   
   const getCalendarList = () => {
@@ -127,6 +129,7 @@ export default function Calendar() {
       ).then((response) => {
         data = response.data
         console.log(data)
+        calendarLoad = 1;
       }).catch((error) => {
         console.log(error.response)
         errcnt++
@@ -168,29 +171,57 @@ export default function Calendar() {
     setSelectedMonth(Number(e.target.value));
   };
 
+  const openCalendarItem = (date, lectureList, scheduleList) => {
+    if (typeof window !== "undefined")
+      window.parent.postMessage({
+        head: "showSchedule",
+        body: {
+          year: selectedYear,
+          month: selectedMonth,
+          day: parseInt(date),
+          lectureList: lectureList,
+          scheduleList: scheduleList,
+        }
+      }, '*');
+  }
+
   const calendarDate = useCallback(() => {
     let calendarDate = getCalendarDateContext(selectedYear, selectedMonth);
   
     const celendarDateComponent = calendarDate.map((dateLine, idx1) => {
       const calendarDateLine = dateLine.map((date, idx2) => {
         let calendarListComponent = [];
+
+        let calendarDTOList = [];
+        let examScheduleDTOList = [];
       
         if(calendarList.length != 0) {
+          let keyIdx = 0
           for(let i = 0; i < calendarList.calendarDTO.length; i++) {
             if(calendarList.calendarDTO[i].endDate == (selectedYear+"-"+('00' + selectedMonth).slice(-2)+"-"+('00' + date).slice(-2))) {
-                
-            console.log(calendarList.calendarDTO[i].endDate)
-            console.log(selectedYear+"-"+('00' + selectedMonth).slice(-2)+"-"+('00' + date).slice(-2))
+              
+              calendarDTOList.push(calendarList.calendarDTO[i])
               calendarListComponent.push(
-                <h6>{calendarList.calendarDTO[i].title}</h6>
+                <p key={keyIdx++}>{"💻"+calendarList.calendarDTO[i].title}</p>
+              )
+            }
+          }
+          for(let i = 0; i < calendarList.examScheduleDTO.length; i++) {
+            if(calendarList.examScheduleDTO[i].date == (selectedYear+"-"+('00' + selectedMonth).slice(-2)+"-"+('00' + date).slice(-2))) {
+              
+              examScheduleDTOList.push(calendarList.examScheduleDTO[i])
+              calendarListComponent.push(
+                <p key={keyIdx++}>{"✨"+calendarList.examScheduleDTO[i].title}</p>
               )
             }
           }
         }
 
         return (
-          <td key={idx1+""+idx2} className={idx2 == 0?calendarstyles.sun:idx2==6?calendarstyles.sat:""}>
-            <h6>
+          <td key={idx1+""+idx2} onClick={()=>{
+            openCalendarItem(date, calendarDTOList, examScheduleDTOList)
+          }}>
+            <h6 className={idx2 == 0?calendarstyles.sun:idx2==6?calendarstyles.sat:""}>
               {date}
             </h6>
             <div>
@@ -199,11 +230,18 @@ export default function Calendar() {
           </td>
         )
       });
-  
+      
       return <tr key={idx1}>{calendarDateLine}</tr>
     });
-  
-    return (
+    
+    if(!calendarLoad) return (
+      <div className={loadingstyles.main}>
+        <div className={loadingstyles.square}>
+          <div className={loadingstyles.spin}></div>
+        </div>
+      </div>
+    )
+    else return (
       <table className={calendarstyles.calendar_date}>
         <tbody>
           {celendarDateComponent}
@@ -211,6 +249,11 @@ export default function Calendar() {
       </table>
     )
   }, [selectedYear, selectedMonth, dateTotalCount, calendarList, userData]);
+  
+  const addScheduleShow = () => {
+    if (typeof window !== "undefined")
+      window.parent.postMessage({ head: "addSchedule", body: { year: selectedYear, month: selectedMonth } }, '*');
+  }
 
   return (
     <div ref={slideRef}>
@@ -237,7 +280,7 @@ export default function Calendar() {
             </div>
             <div className={calendarstyles.calendar_title_contour}></div>
             <div className={calendarstyles.calendar_title_schedule}>
-              <div className={calendarstyles.calendar_title_schedule_btn}>
+              <div className={calendarstyles.calendar_title_schedule_btn} onClick={() => addScheduleShow()}>
                 <h5>시험일정 추가</h5>
               </div>
             </div>

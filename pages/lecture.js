@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import lecturestyles from '../styles/Lecture.module.css'
+import loadingstyles from '../styles/Loading.module.css'
 import MARQUEE from "react-fast-marquee";
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
 import axios from 'axios'
@@ -41,9 +42,7 @@ export default function Lecture() {
   }, [])
   
   useEffect(() => {
-    console.log("helloasdasdasdasdsad");
     const slideHeight = slideRef && slideRef.current && slideRef.current.offsetHeight;
-    console.log(slideHeight)
     window.parent.postMessage({ head: "changeHeight", body: {view: "Lecture", height: slideHeight } }, '*');
   })
   
@@ -56,6 +55,8 @@ export default function Lecture() {
       else if(subject.contentsType == "file") img_src += "file.png"
       else if(subject.contentsType == "offline_attendance") img_src += "lecture.png"
       else if(subject.contentsType == "text") img_src += "text.png"
+      else if(subject.contentsType == "zoom") img_src += "zoom.png"
+      else if(subject.contentsType == "video_conference") img_src += "video.png"
 
       return (
         <div key={"lectureSubject"+idx} className={lecturestyles.lecture_subject}>
@@ -66,8 +67,8 @@ export default function Lecture() {
     });
     if(subjectList.length == 0) {
       subjectList = (
-        <div className={lecturestyles.lecture_subject}>
-          <h5>-</h5>
+        <div className={lecturestyles.lecture_subject_empty}>
+          <h3>-</h3>
         </div>
       )
     }
@@ -75,45 +76,116 @@ export default function Lecture() {
     return <div className={lecturestyles.lecture_subjects}>{subjectList}</div>;
   }
   
-  const deleteTodo = (id) => {
-    console.log(id)
+  const checkTodoList = async (e) => {
+    let REQ_URL = process.env.FRONT_BASE_URL + "/backapi/list/todo/check"
+    if(!e.target.checked) REQ_URL += "/cancel"
+    REQ_URL += "?toDoId="+e.target.value
+    await axios.get(
+      REQ_URL
+    ).then((response) => {
+      listLoading[selectedWeeks] = 0;
+      getLectureItems()
+    }).catch((error) => {
+      console.log(error)
+    });
+  }
+  
+  const deleteTodoList = async (todoId) => {
+    const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/list/todo/cancel?toDoId="+todoId
+    await axios.get(
+      REQ_URL
+    ).then((response) => {
+      alert("TO-DO LIST를 삭제했습니다")
+      listLoading[selectedWeeks] = 0;
+      getLectureItems()
+    }).catch((error) => {
+      console.log(error)
+    });
+  }
+
+  const addTodoList = async (subjectId) => {
+    let content = prompt("TO-DO LIST를 입력해주세요");
+    if(!content) return
+
+    const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/list/todo"
+    await axios.post(REQ_URL, {
+      studentId: stdid,
+      subjectId: subjectId,
+      week: selectedWeeks,
+      content: content
+    }, {
+      timeout: 90000,
+      withCredentials: true
+    }).then((response) => {
+      alert("TO-DO LIST 추가에 성공했습니다!")
+      listLoading[selectedWeeks] = 0;
+      getLectureItems()
+    }).catch((error) => {
+      console.log(error)
+    });
   }
 
   const getLectureTodoLists = (item) => {
-    //weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO = ["집가서 떡볶이 먹기"]
-    let todoList = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO.map((subject, idx) => 
+    let todoList = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO.map((todoItem, idx) => 
       <div key={"lectureTodoList"+idx} className={lecturestyles.lecture_todolist_content}>
-        <div className={lecturestyles.lecture_todolist_title}>
-          <input className={lecturestyles.lecture_todolist_check} type="checkbox" name="check" id="GFG" value="1" defaultChecked />
-          <h4>{subject}</h4>
-          <img src="images/trash.png" onClick={deleteTodo(idx)}/>
-        </div>
         <hr/>
+        <div className={lecturestyles.lecture_todolist_item}>
+          <input className={lecturestyles.lecture_todolist_check} type="checkbox" name="check" id="GFG" value={todoItem.toDoId} onChange={(e)=>checkTodoList(e)} defaultChecked={todoItem.isDone?"defaultChecked":""} />
+          <div className={lecturestyles.lecture_todolist_title}>
+            <h5>{todoItem.content}</h5>
+          </div>
+          <img src="images/trash.png" onClick={() => {
+            deleteTodoList(todoItem.toDoId)
+          }}/>
+        </div>
       </div>
     );
     if(todoList.length == 0) {
       todoList = (
-        <div className={lecturestyles.lecture_todolist_content}>
-          <div className={lecturestyles.lecture_todolist_title}>
-            <h4>-</h4>
-            <hr/>
-          </div>
+        <div className={lecturestyles.lecture_todolist_title_empty}>
+          <h3>-</h3>
         </div>
       )
     }
   
-    return <div className={lecturestyles.lecture_todolist}>{todoList}</div>;
+    return (
+      <div className={lecturestyles.lecture_todolist}>
+        <div className={lecturestyles.lecture_todolist_titlebar}>
+          <h4>TO-DO-LIST</h4>
+          <div onClick={() => {
+            const title = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].title
+            addTodoList(title.slice(-11, title.length-1))
+          }}>
+            <h4>추가</h4>
+          </div>
+        </div>
+        {todoList}
+      </div>
+    )
   }
   
-  const getLectureNotice = () => {
+  const getLectureNotice = (i) => {
+    const lectureNoticeList = weeklySubjectList[selectedWeeks].subjectNoticeListDTO[i].subjectNoticeDTO.map((notice, idx) =>  {
+      return (
+        <h6 key={idx} onClick={() => {
+          window.open(notice.noticeLink, '_blank')
+        }}>
+          {notice.title}
+        </h6>
+      )
+    })
+
     return (
-      <MARQUEE>안녕하세요 LMSSU입니다. 즐거운 학교생활 되세요~</MARQUEE>
+      <marquee>
+        <div>
+          {lectureNoticeList}
+        </div>
+      </marquee>
     )
   }
 
   const getLectureItems = () => {
     const getApi = async () => {
-      console.log("asd")
       const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/list?week="+selectedWeeks
       let data
       let tmpList = weeklySubjectList.slice()
@@ -135,7 +207,6 @@ export default function Lecture() {
         tmpList[selectedWeeks] = data
         weeklySubjectList[selectedWeeks] = tmpList[selectedWeeks]
         listLoading[selectedWeeks-1] = 2;
-        console.log(tmpList)
       }).catch((error) => {
         console.log(error.response)
         
@@ -156,17 +227,19 @@ export default function Lecture() {
     let lectureList;
 
     if(weeklySubjectList[selectedWeeks] !== undefined) {
-      lectureList = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO.map((lecture, idx) =>  {
+      lectureList = weeklySubjectList[selectedWeeks].subjectNoticeListDTO.map((lecture, idx) =>  {
         return (
           <div key={"lecture"+idx} className={lecturestyles.lecture_item}>
             <div className={lecturestyles.lecture_top_bar}>
               <h3>{lecture.title}</h3>
               <div className={lecturestyles.div_grow}></div>
-              <img src="images/home-icon-silhouette.png"/>
+              <img src="images/home-icon-silhouette.png" onClick={() => {
+                window.open(lecture.homepageAddress, '_blank')
+              }}/>
             </div>
             <div className={lecturestyles.lecture_notice}>
               <img src="images/megaphone.png"/>
-              {getLectureNotice()}
+              {getLectureNotice(idx)}
             </div>
             <div className={lecturestyles.lecture_content}>
               {getLectureSubjects(idx)}
@@ -181,7 +254,9 @@ export default function Lecture() {
       )
     } else {
       return (
-        "asdasd"
+        <div className={loadingstyles.main}>
+          <div className={loadingstyles.clock}></div>
+        </div>
       )
     }
   }, [selectedWeeks, weeklySubjectList])
