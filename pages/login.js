@@ -120,40 +120,6 @@ export default function Login() {
       console.log("로그인중..")
 
       setLoginSubmit(1)
-      
-      await axios.post(process.env.FRONT_BASE_URL + "/api/test", {
-        studentId: values.stdid,
-        pwd: values.pwd
-      }, {
-        withCredentials: true
-      }).then((response) => {
-        console.log(response)
-      }).catch((error) => {
-        console.log(error.response)
-      });
-      console.log("로그인중..")
-
-      await axios.post(process.env.FRONT_BASE_URL + "/api/crawl", {
-        studentId: values.stdid,
-        pwd: values.pwd
-      }, {
-        withCredentials: true
-      }).then((response) => {
-        console.log(response)
-        if(response.data.status == 'FAIL') {
-          alert("잘못된 학번 혹은 비밀번호입니다")
-          setLoginSubmit(0)
-          return
-        }
-        status = 1
-      }).catch((error) => {
-        console.log(error.response)
-        alert("ERROR!")
-        setLoginSubmit(0)
-        return
-      });
-
-      if(status != 1) return
 
       await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-in", {
         studentId: values.stdid,
@@ -163,6 +129,7 @@ export default function Login() {
         withCredentials: true
       }).then((response) => {
         console.log(response)
+        status = 1
         if(response.data.student == 'new') {
           status = 2
           let retval = confirm("미등록된 사용자입니다.\n회원가입을 진행하시겠습니까?")
@@ -174,7 +141,11 @@ export default function Login() {
         }
       }).catch((error) => {
         console.log(error.response)
-        alert("ERROR!")
+        if(error.response.data.message == "login error") {
+          alert("잘못된 사용자 정보입니다")
+        } else {
+          alert("ERROR!")
+        }
         setLoginSubmit(0)
         status = 0
         return

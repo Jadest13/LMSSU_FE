@@ -2,16 +2,10 @@ import Head from 'next/head'
 import Image from 'next/image'
 import calendarstyles from '../styles/Calendar.module.css'
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
+import axios from 'axios'
 
+let stdid, pwd;
 let errcnt = 0;
-
-if (typeof window !== "undefined") {
-  window.onload = () => {
-  }
-
-  window.onclick = (e) => {
-  }
-}
 
 const slideRef = React.createRef();
 
@@ -94,13 +88,54 @@ export default function Calendar() {
   const [selectedYear, setSelectedYear] = useState(now.getFullYear()); //현재 선택된 연도
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth()+1); //현재 선택된 달
 
+  const [calendarList, setCalendarList] = useState([]);
+
   const dateTotalCount = new Date(selectedYear, selectedMonth, 0).getDate(); //선택된 연도, 달의 마지막 날짜
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+
+    for(const param of searchParams) {
+      if(param[0] == 'stdid') {
+        stdid = param[1]
+      }
+      if(param[0] == 'pwd') {
+        pwd = param[1]
+      }
+    }
+
+    getCalendarList();
+  }, [])
 
   useEffect(() => {
     const slideHeight = slideRef && slideRef.current && slideRef.current.offsetHeight;
     console.log(slideHeight)
     window.parent.postMessage({ head: "changeHeight", body: {view: "Calendar", height: slideHeight } }, '*');
   });
+  
+  const getCalendarList = () => {
+    const getApi = async () => {
+      const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/calendar?studentId="+stdid
+      let data
+      console.log(REQ_URL)
+      
+      await axios.get(
+        REQ_URL
+      ).then((response) => {
+        data = response.data
+        console.log(data)
+      }).catch((error) => {
+        console.log(error.response)
+        errcnt++
+        if(errcnt >= 3) {
+          window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
+        }
+      });
+
+      setCalendarList(data)
+    }
+    getApi();
+  }
 
   const changeYearPrev = useCallback(() => {
     setSelectedYear(selectedYear - 1);
@@ -135,9 +170,31 @@ export default function Calendar() {
   
     const celendarDateComponent = calendarDate.map((dateLine, idx1) => {
       const calendarDateLine = dateLine.map((date, idx2) => {
-        if(idx2 == 0) return <td key={idx1+""+idx2} className={calendarstyles.sun}>{date}</td>
-        else if(idx2 == 6) return <td key={idx1+""+idx2} className={calendarstyles.sat}>{date}</td>
-        else return <td key={idx1+""+idx2}>{date}</td>
+        let calendarListComponent = [];
+      
+        if(calendarList.length != 0) {
+          for(let i = 0; i < calendarList.calendarDTO.length; i++) {
+            if(calendarList.calendarDTO[i].endDate == (selectedYear+"-"+('00' + selectedMonth).slice(-2)+"-"+('00' + date).slice(-2))) {
+                
+            console.log(calendarList.calendarDTO[i].endDate)
+            console.log(selectedYear+"-"+('00' + selectedMonth).slice(-2)+"-"+('00' + date).slice(-2))
+              calendarListComponent.push(
+                <h6>{calendarList.calendarDTO[i].title}</h6>
+              )
+            }
+          }
+        }
+
+        return (
+          <td key={idx1+""+idx2} className={idx2 == 0?calendarstyles.sun:idx2==6?calendarstyles.sat:""}>
+            <h6>
+              {date}
+            </h6>
+            <div>
+              {calendarListComponent}
+            </div>
+          </td>
+        )
       });
   
       return <tr key={idx1}>{calendarDateLine}</tr>
@@ -150,7 +207,7 @@ export default function Calendar() {
         </tbody>
       </table>
     )
-  }, [selectedYear, selectedMonth, dateTotalCount]);
+  }, [selectedYear, selectedMonth, dateTotalCount, calendarList]);
 
   return (
     <div ref={slideRef}>

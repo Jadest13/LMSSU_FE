@@ -84,10 +84,10 @@ export default function Home() {
       window.location.href=process.env.FRONT_BASE_URL+'/login';
     }
 
-    getUserData()
+    getUserData(stdid, pwd)
   }, [])
 
-  const getUserData = async () => {
+  const getUserData = async (stdid, pwd) => {
     await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-in", {
       studentId: stdid,
       userId: stdid,

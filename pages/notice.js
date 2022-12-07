@@ -32,39 +32,6 @@ export default function Notice() {
       }
     }
 
-    const getApi = async () => {
-      noticeList = []
-      let tmpList = [[], [], []]
-      let url = ""
-      for(let i = 0; i < 3; i++) {
-        for(let j = 1; j <= 4; j++) {
-          console.log(i +" " + j)
-          url = process.env.FRONT_BASE_URL+"/backapi/notice/"
-          if(i == 0) url += "ssu?"
-          else if(i == 1) url += "major?studentId="+stdid+"&"
-          else if(i == 2) url += "fun?"
-          url += "page="+j
-    
-          await axios.get(
-            url
-          ).then((response) => {
-            const data = response.data
-            tmpList[i][j-1] = data.ssuNoticeDTO
-            noticeList = tmpList.slice()
-            setSelectedNoticeList(noticeList)
-          }).catch((error) => {
-            console.log(error.response)
-          }).catch((error) => {
-            console.log(error.response)
-            errcnt++
-            if(errcnt >= 3) {
-              window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
-            }
-          })
-        }
-      }
-    }
-    getApi();
   }, [])
 
   useEffect(() => {
@@ -75,11 +42,48 @@ export default function Notice() {
 
   const [selectedPage, setSelectedPage] = useState(1);
   const [selectedNotice, setSelectedNotice] = useState(0);
-  const [selectedNoticeList, setSelectedNoticeList] = useState([]);
+  const [selectedNoticeList, setSelectedNoticeList] = useState([[], [], []]);
+
+  const changeSelectedPage = (idx) => {
+    const getApi = async () => {
+      let data
+      let tmpList = selectedNoticeList.slice();
+      let url = process.env.FRONT_BASE_URL+"/backapi/notice/"
+      if(selectedNotice == 0) url += "ssu?"
+      else if(selectedNotice == 1) url += "major?studentId="+stdid+"&"
+      else if(selectedNotice == 2) url += "fun?"
+      url += "page="+selectedPage
+
+      await axios.get(
+        url
+      ).then((response) => {
+        data = response.data
+        tmpList[selectedNotice][selectedPage-1] = data.ssuNoticeDTO
+        selectedNoticeList[selectedNotice][selectedPage-1] = tmpList[selectedNotice][selectedPage-1]
+        console.log(tmpList)
+      }).catch((error) => {
+        console.log(error.response)
+        errcnt++
+        if(errcnt >= 3) {
+          window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
+        }
+      })
+      setSelectedNoticeList(tmpList)
+      console.log(selectedNoticeList)
+    }
+
+    if(selectedNoticeList[selectedNotice][selectedPage]) {
+      console.log("ASdASD")
+    } else {
+      getApi();
+    }
+
+    setSelectedPage(idx)
+  }
 
   const changeNoticeType = (type) => {
     setSelectedNotice(type)
-    setSelectedPage(1)
+    changeSelectedPage(1)
   }
 
   const getNoticeType = useCallback(() => {
@@ -122,18 +126,18 @@ export default function Notice() {
         window.open('https://fun.ssu.ac.kr/', '_blank')
       }
     } else {
-      setSelectedPage(num)
+      changeSelectedPage(num)
     }
   };
 
   const changeNoticePagePrev = () => {
     if(selectedPage > 1)
-      setSelectedPage(selectedPage - 1);
+      changeSelectedPage(selectedPage - 1)
   };
 
   const changeNoticePageNext = () => {
     if(selectedPage < 4)
-      setSelectedPage(selectedPage + 1);
+      changeSelectedPage(selectedPage + 1)
   };
   
   const getNoticePage = useCallback(() => {

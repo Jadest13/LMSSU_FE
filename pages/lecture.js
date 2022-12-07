@@ -67,6 +67,10 @@ export default function Lecture() {
     return <div className={lecturestyles.lecture_subjects}>{subjectList}</div>;
   }
   
+  const deleteTodo = (id) => {
+    setSelectedWeeks(selectedWeeks)
+  }
+
   const getLectureTodoLists = (item) => {
     let todoList = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO.map((subject, idx) => 
       <div key={"lectureTodoList"+idx} className={lecturestyles.lecture_todolist_content}>
@@ -75,6 +79,7 @@ export default function Lecture() {
           <h4>{subject}</h4>
           <hr/>
         </div>
+        {/* <img src="images/trash.png" onClick={deleteTodo(weeklySubjectList[selectedWeeks].)}></img> */}
       </div>
     );
     if(todoList.length == 0) {
