@@ -139,7 +139,6 @@ export default function Lecture() {
       }).catch((error) => {
         console.log(error.response)
         
-        if(listLoading[selectedWeeks-1] == 1) listLoading[selectedWeeks-1] = 0;
         errcnt++
         if(errcnt >= 3) {
           window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
