@@ -7,10 +7,10 @@ export default async function handler(req, res) {
     console.log(req.body)
 
     const browser = await puppeteer.launch({headless: true});
-    const page = await browser.newPage();
-    const ndhs_id = studentId; // 추후 로그인 폼에서 각자의 아이디 비밀번호를 입력받게 할 예정
-    const ndhs_pw = pwd;
-    
+    // const page = await browser.newPage();
+    // const ndhs_id = studentId; // 추후 로그인 폼에서 각자의 아이디 비밀번호를 입력받게 할 예정
+    // const ndhs_pw = pwd;
+
     res.status(200).json({ id: studentId, pwd: pwd, status: "OK" })
 
     // page.setDefaultNavigationTimeout(5000); 
