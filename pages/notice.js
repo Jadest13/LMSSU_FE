@@ -44,7 +44,7 @@ export default function Notice() {
   const [selectedNotice, setSelectedNotice] = useState(0);
   const [selectedNoticeList, setSelectedNoticeList] = useState([[], [], []]);
 
-  const changeSelectedPage = (idx) => {
+  const getNoticeListAPI = () => {
     const getApi = async () => {
       let data
       let tmpList = selectedNoticeList.slice();
@@ -72,18 +72,12 @@ export default function Notice() {
       console.log(selectedNoticeList)
     }
 
-    if(selectedNoticeList[selectedNotice][selectedPage]) {
-      console.log("ASdASD")
-    } else {
-      getApi();
-    }
-
-    setSelectedPage(idx)
+    getApi()
   }
 
   const changeNoticeType = (type) => {
     setSelectedNotice(type)
-    changeSelectedPage(1)
+    setSelectedPage(1)
   }
 
   const getNoticeType = useCallback(() => {
@@ -126,18 +120,18 @@ export default function Notice() {
         window.open('https://fun.ssu.ac.kr/', '_blank')
       }
     } else {
-      changeSelectedPage(num)
+      setSelectedPage(num)
     }
   };
 
   const changeNoticePagePrev = () => {
     if(selectedPage > 1)
-      changeSelectedPage(selectedPage - 1)
+      setSelectedPage(selectedPage - 1)
   };
 
   const changeNoticePageNext = () => {
     if(selectedPage < 4)
-      changeSelectedPage(selectedPage + 1)
+      setSelectedPage(selectedPage + 1)
   };
   
   const getNoticePage = useCallback(() => {
@@ -170,7 +164,7 @@ export default function Notice() {
     let noticeListComponent;
     if(selectedNotice >= selectedNoticeList.length || selectedPage > selectedNoticeList[selectedNotice].length) {
       noticeListComponent = (
-        <div className={noticestyles.notice_content_loading}>asdasd</div>
+        <div className={noticestyles.notice_content_loading}>{selectedNotice}asdasd{selectedPage}</div>
       )
     } else {
       noticeListComponent = selectedNoticeList[selectedNotice][selectedPage-1].map((name, idx) => 
@@ -193,6 +187,29 @@ export default function Notice() {
     return <div className={noticestyles.notice_contents}>{noticeListComponent}</div>;
   }, [selectedNotice, selectedPage, selectedNoticeList])
 
+  const getMainComponent = useCallback(() => {
+    
+    if(!selectedNoticeList[selectedNotice][selectedPage]) {
+      getNoticeListAPI()
+    }
+
+    return (
+      <div className={noticestyles.notice_board}>
+        {getNoticeType()}
+        <div className={noticestyles.notice_contents}>
+          {getNoticeList()}
+        </div>
+        <div className={noticestyles.notice_page}>
+          <div className={noticestyles.div_grow}></div>
+          <h4 onClick={changeNoticePagePrev}>{"<"}</h4>
+          {getNoticePage()}
+          <h4 onClick={changeNoticePageNext}>{">"}</h4>
+          <div className={noticestyles.div_grow}></div>
+        </div>
+      </div>
+    )
+  }, [selectedNotice, selectedPage, selectedNoticeList])
+
   return (
     <div ref={slideRef}>
       <Head>
@@ -202,19 +219,7 @@ export default function Notice() {
       </Head>
 
       <main>
-        <div className={noticestyles.notice_board}>
-          {getNoticeType()}
-          <div className={noticestyles.notice_contents}>
-            {getNoticeList()}
-          </div>
-          <div className={noticestyles.notice_page}>
-            <div className={noticestyles.div_grow}></div>
-            <h4 onClick={changeNoticePagePrev}>{"<"}</h4>
-            {getNoticePage()}
-            <h4 onClick={changeNoticePageNext}>{">"}</h4>
-            <div className={noticestyles.div_grow}></div>
-          </div>
-        </div>
+        {getMainComponent()}
       </main>
     </div>
   )

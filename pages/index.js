@@ -66,21 +66,35 @@ const GetMessage = () => {
 
 export default function Home() {
 
-  const [userData, setUserData] = useState({})
+  const [userData, setUserData] = useState({
+    stdid: "",
+    pwd: "",
+    name: "",
+    major: "",
+    status: ""
+  })
   
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
 
     for(const param of searchParams) {
       if(param[0] == 'stdid') {
+        setUserData({
+          ...userData,
+          stdid: param[1],
+        })
         stdid = param[1]
       }
       if(param[0] == 'pwd') {
+        setUserData({
+          ...userData,
+          pwd: param[1],
+        })
         pwd = param[1]
       }
     }
     
-    if(stdid === undefined || pwd === undefined) {
+    if(userData.stdid === undefined || userData.pwd === undefined) {
       window.location.href=process.env.FRONT_BASE_URL+'/login';
     }
 
@@ -88,6 +102,7 @@ export default function Home() {
   }, [])
 
   const getUserData = async (stdid, pwd) => {
+    console.log(stdid, pwd)
     await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-in", {
       studentId: stdid,
       userId: stdid,
@@ -101,8 +116,8 @@ export default function Home() {
         window.location.href=process.env.FRONT_BASE_URL+'/login';
       }
       setUserData({
+        ...userData,
         major: response.data.major,
-        stdid: response.data.studentId,
         name: response.data.name,
         status: response.data.student,
       })
@@ -121,6 +136,26 @@ export default function Home() {
         <p>{userData.name}</p>
       </div>
     )
+  }, [userData])
+
+  const getMainBoard = useCallback(() => {
+    if(!userData.stdid) {
+      return ("");
+    } else {
+      return (
+        <div className={styles.main_board}>
+          <div className={styles.board_left}>
+            <iframe src={"/calendar?stdid="+stdid+"&pwd="+pwd} id="calendarBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+            <iframe src={"/subject?stdid="+stdid+"&pwd="+pwd} id="subjectBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+            <iframe src={"/notice?stdid="+stdid+"&pwd="+pwd} id="noticeBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+          </div>
+          <div className={styles.board_right}>
+            <iframe src={"/lecture?stdid="+stdid+"&pwd="+pwd} id="lectureBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+          </div>
+        </div>
+      )
+    }
+    
   }, [userData])
 
   return (
@@ -167,16 +202,7 @@ export default function Home() {
       </header>
 
       <main className={styles.main}>
-        <div className={styles.main_board}>
-          <div className={styles.board_left}>
-            <iframe src={"/calendar?stdid="+stdid+"&pwd="+pwd} id="calendarBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
-            <iframe src={"/subject?stdid="+stdid+"&pwd="+pwd} id="subjectBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
-            <iframe src={"/notice?stdid="+stdid+"&pwd="+pwd} id="noticeBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
-          </div>
-          <div className={styles.board_right}>
-            <iframe src={"/lecture?stdid="+stdid+"&pwd="+pwd} id="lectureBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
-          </div>
-        </div>
+        {getMainBoard()}
       </main>
 
       <footer className={styles.footer}>
