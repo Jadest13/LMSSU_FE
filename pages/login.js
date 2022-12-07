@@ -121,6 +121,16 @@ export default function Login() {
 
       setLoginSubmit(1)
       
+      await axios.post(process.env.FRONT_BASE_URL + "/api/test", {
+        studentId: values.stdid,
+        pwd: values.pwd
+      }, {
+        withCredentials: true
+      }).then((response) => {
+        console.log(response)
+      }).catch((error) => {
+        console.log(error.response)
+      });
       console.log("로그인중..")
 
       await axios.post(process.env.FRONT_BASE_URL + "/api/crawl", {
