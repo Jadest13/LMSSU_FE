@@ -189,7 +189,7 @@ export default function Notice() {
 
   const getMainComponent = useCallback(() => {
     
-    if(!selectedNoticeList[selectedNotice][selectedPage]) {
+    if(!selectedNoticeList[selectedNotice][selectedPage-1]) {
       getNoticeListAPI()
     }
 
@@ -208,7 +208,7 @@ export default function Notice() {
         </div>
       </div>
     )
-  }, [selectedNotice, selectedPage, selectedNoticeList])
+  }, [selectedNotice, selectedPage])
 
   return (
     <div ref={slideRef}>
