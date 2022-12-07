@@ -3,9 +3,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import headerstyles from '../styles/Header.module.css'
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import axios from 'axios'
 
-let stdid = 20182651, pwd = "sndnrn12!";
+let stdid, pwd;
 
 if (typeof window !== "undefined") {
   window.onload = () => {
@@ -63,6 +64,64 @@ const GetMessage = () => {
 }
 
 export default function Home() {
+
+  const [userData, setUserData] = useState({})
+  
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+
+    for(const param of searchParams) {
+      if(param[0] == 'stdid') {
+        stdid = param[1]
+      }
+      if(param[0] == 'pwd') {
+        pwd = param[1]
+      }
+    }
+    
+    if(stdid === undefined || pwd === undefined) {
+      window.location.href=process.env.FRONT_BASE_URL+'/login';
+    }
+
+    getUserData()
+  }, [])
+
+  const getUserData = async () => {
+    await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-in", {
+      studentId: stdid,
+      userId: stdid,
+      pwd: pwd
+    }, {
+      withCredentials: true
+    }).then((response) => {
+      console.log("asd", response)
+      console.log(response.data.student)
+      if(response.data.student == 'new') {
+        window.location.href=process.env.FRONT_BASE_URL+'/login';
+      }
+      setUserData({
+        major: response.data.major,
+        stdid: response.data.studentId,
+        name: response.data.name,
+        status: response.data.student,
+      })
+    }).catch((error) => {
+      console.log(error.response)
+      return
+    });
+  }
+
+  const getUserDataComponent = useCallback(() => {
+    console.log(userData)
+    return (
+      <div>
+        <p>{userData.major}</p>
+        <p>{userData.stdid}</p>
+        <p>{userData.name}</p>
+      </div>
+    )
+  }, [userData])
+
   return (
     <div className={styles.container}>
       <Head>
@@ -85,11 +144,7 @@ export default function Home() {
             <div className={headerstyles.dropdown}>
               <div id="userInfoBtn" className={headerstyles.dropbtn}>
                 <img src="/images/user.png" alt=""/>
-                <div>
-                  <p>컴퓨터학부</p>
-                  <p>20182618</p>
-                  <p>최규현</p>
-                </div>
+                {getUserDataComponent()}
               </div>
               <div id="userInfoDiv" className={headerstyles.dropdown_content}>
                 <div className={headerstyles.dropdown_content_list}>
@@ -98,7 +153,9 @@ export default function Home() {
                   </p>
                 </div>
                 <div className={headerstyles.dropdown_content_logout}>
-                  <p className={headerstyles.logout_btn}>
+                  <p className={headerstyles.logout_btn} onClick={() => {
+                    window.location.href=process.env.FRONT_BASE_URL+'/login';
+                  }}>
                     로그아웃
                   </p>
                 </div>
@@ -109,13 +166,15 @@ export default function Home() {
       </header>
 
       <main className={styles.main}>
-        <div className={styles.board_left}>
-          <iframe src={"/calendar?stdid="+stdid+"&pwd="+pwd} id="calendarBoard" className={styles.board_calendar} frameBorder="0" scrolling="no" />
-          {/* <iframe src={"/subject?stdid="+stdid+"&pwd="+pwd} id="subjectBoard" className={styles.board_subject} frameBorder="0" scrolling="no" />
-          <iframe src={"/notice?stdid="+stdid+"&pwd="+pwd} id="noticeBoard" className={styles.board_notice} frameBorder="0" scrolling="no" /> */}
-        </div>
-        <div className={styles.board_right}>
-          {/* <iframe src={"/lecture?stdid="+stdid+"&pwd="+pwd} id="lectureBoard" className={styles.board_lecture} frameBorder="0" scrolling="no" /> */}
+        <div className={styles.main_board}>
+          <div className={styles.board_left}>
+            <iframe src={"/calendar?stdid="+stdid+"&pwd="+pwd} id="calendarBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+            <iframe src={"/subject?stdid="+stdid+"&pwd="+pwd} id="subjectBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+            <iframe src={"/notice?stdid="+stdid+"&pwd="+pwd} id="noticeBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+          </div>
+          <div className={styles.board_right}>
+            <iframe src={"/lecture?stdid="+stdid+"&pwd="+pwd} id="lectureBoard" className={styles.board_iframe} frameBorder="0" scrolling="no" />
+          </div>
         </div>
       </main>
 

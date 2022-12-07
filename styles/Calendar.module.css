@@ -27,7 +27,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin: 0 2rem;
+  margin: 0 1.25rem;
 }
 
 .calendar_title_year > div > h3 {

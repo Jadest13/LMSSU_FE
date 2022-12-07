@@ -53,6 +53,11 @@ export default function Notice() {
             setSelectedNoticeList(noticeList)
           }).catch((error) => {
             console.log(error.response)
+          }).catch((error) => {
+            console.log(error.response)
+            if(error.response.status == 404) {
+              window.location.href=process.env.FRONT_BASE_URL+'/asd';
+            }
           })
         }
       }
@@ -166,11 +171,11 @@ export default function Notice() {
         <div key={"notice"+idx}>
           <div className={noticestyles.notice_content}>
             <p className={noticestyles.notice_content_dot}>·</p>
-            <a className={noticestyles.notice_content_title} onClick={() => {
+            <p className={noticestyles.notice_content_title} onClick={() => {
               window.open(name.url, '_blank')
             }}>
               {name.title}
-            </a>
+            </p>
             <div></div>
             <p className={noticestyles.notice_content_date}>{name.date}</p>
           </div>

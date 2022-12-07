@@ -18,6 +18,28 @@ body {
   color: #5c5a59;
 }
 
+@media (min-width:239px) {
+  html,
+  body {
+    font-size: 9px;
+  }
+}
+
+
+@media (min-width:349px) {
+  html,
+  body {
+    font-size: 11px;
+  }
+}
+
+@media (min-width:499px) {
+  html,
+  body {
+    font-size: 14px;
+  }
+}
+
 header {
   width: 100%;
   position: fixed;

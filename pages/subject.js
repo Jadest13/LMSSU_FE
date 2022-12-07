@@ -34,6 +34,11 @@ export default function Subject() {
         console.log(data.Results)
         setSubjectList(data.Results)
         setSubjectShow([0, 0, 0, 0, 0])
+      }).catch((error) => {
+        console.log(error.response)
+        if(error.response.status == 404) {
+          window.location.href=process.env.FRONT_BASE_URL+'/asd';
+        }
       })
     }
     getApi();
@@ -63,6 +68,7 @@ export default function Subject() {
           if(item.contentsType == "assignment") img_src += "assignment.png"
           else if(item.contentsType == "mp4") img_src += "play-button.png"
           else if(item.contentsType == "pdf") img_src += "pdf.png"
+          else if(item.contentsType == "text") img_src += "text.png"
 
           let dday = parseInt((new Date(item.endDate).getTime() - new Date().getTime())/(1000*60*60*24))
 

@@ -117,6 +117,9 @@ export default function Lecture() {
         console.log(tmpList)
       }).catch((error) => {
         console.log(error.response)
+        if(error.response.status == 404) {
+          window.location.href=process.env.FRONT_BASE_URL+'/asd';
+        }
       });
 
       setWeeklySubjectList(tmpList)

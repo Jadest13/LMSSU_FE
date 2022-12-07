@@ -49,145 +49,6 @@ export default function Login() {
     name: false,
     major: false,
   })
-  
-  const handleChange = e => {
-    setValues({
-      ...values,
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  // blur 이벤트가 발생하면 touched 상태를 true로 바꾼다
-  const handleBlur = e => {
-    setTouched({
-      ...touched,
-      [e.target.name]: true,
-    })
-  }
-  
-  const handleLoginSubmit = async e => {
-    let status = 0
-
-    e.preventDefault()
-
-    // 모든 필드에 방문했다고 표시한다.
-    setTouched({
-      stdid: true,
-      pwd: true,
-      name: true,
-      major: true,
-    })
-
-    // 필드 검사 후 잘못된 값이면 제출 처리를 중단한다.
-    const errors = validate()
-    // 오류 메세지 상태를 갱신한다
-    setErrors(errors)
-    // 잘못된 값이면 제출 처리를 중단한다.
-    if (Object.values(errors).some(v => v)) {
-      return
-    }
-    console.log("로그인중..")
-
-    setLoginSubmit(1)
-    
-    console.log("로그인중..")
-    await axios.post(process.env.FRONT_BASE_URL + "/api/crawl", {
-      studentId: values.stdid,
-      pwd: values.pwd
-    }, {
-      withCredentials: true
-    }).then((response) => {
-      console.log(response)
-      if(response.data.status == 'FAIL') {
-        alert("잘못된 학번 혹은 비밀번호입니다")
-        setLoginSubmit(0)
-        return
-      }
-      status = 1
-    }).catch((error) => {
-      console.log(error.response)
-      alert("ERROR!")
-      setLoginSubmit(0)
-      return
-    });
-
-    if(status != 1) return
-
-    await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-in", {
-      studentId: values.stdid,
-      userId: values.stdid,
-      pwd: values.pwd
-    }, {
-      withCredentials: true
-    }).then((response) => {
-      console.log(response)
-      if(response.data.student == 'new') {
-        status = 2
-        let retval = confirm("미등록된 사용자입니다.\n회원가입을 진행하시겠습니까?")
-        if(retval) {
-          setSignUpMode(1)
-        } else {
-          setLoginSubmit(0)
-        }
-      }
-    }).catch((error) => {
-      console.log(error.response)
-      alert("ERROR!")
-      setLoginSubmit(0)
-      return
-    });
-    
-    if(status == 1) {
-      window.location.href=process.env.FRONT_BASE_URL+'/?stdid='+values.stdid+'&pwd='+values.pwd;
-    }
-  }
-
-  const handleSignUpSubmit = async e => {
-
-    setSignUpSubmit(1)
-
-    e.preventDefault()
-
-    // 모든 필드에 방문했다고 표시한다.
-    setTouched({
-      stdid: true,
-      pwd: true,
-      name: true,
-      major: true,
-    })
-
-    // 필드 검사 후 잘못된 값이면 제출 처리를 중단한다.
-    const errors = validate()
-    // 오류 메세지 상태를 갱신한다
-    setErrors(errors)
-    // 잘못된 값이면 제출 처리를 중단한다.
-    if (Object.values(errors).some(v => v)) {
-      return
-    }
-
-    let retval = confirm("해당 정보로 회원가입을 진행합니다")
-    if(!retval) {
-      setSignUpMode(0)
-      return
-    }
-    
-    await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-up", {
-      studentId: values.stdid,
-      major: values.major,
-      studentName: values.name
-    }, {
-      withCredentials: true
-    }).then((response) => {
-      console.log(response)
-    }).catch((error) => {
-      console.log(error.response)
-      alert("ERROR!")
-      setSignUpSubmit(0)
-      return
-    });
-
-    window.location.href=process.env.FRONT_BASE_URL+'/?stdid='+values.stdid+'&pwd='+values.pwd;
-  }
 
   // 필드값을 검증한다.
   const validate = useCallback(() => {
@@ -220,6 +81,192 @@ export default function Login() {
   }, [validate])
 
   const LoginForm = useCallback(() => {
+    const handleChange = e => {
+      console.log(e.target.value)
+      setValues({
+        ...values,
+        [e.target.name]: e.target.value,
+      })
+    }
+
+    // blur 이벤트가 발생하면 touched 상태를 true로 바꾼다
+    const handleBlur = e => {
+      setTouched({
+        ...touched,
+        [e.target.name]: true,
+      })
+    }
+    
+    const handleLoginSubmit = async e => {
+      let status = 0
+
+      e.preventDefault()
+
+      // 모든 필드에 방문했다고 표시한다.
+      setTouched({
+        stdid: true,
+        pwd: true,
+        name: true,
+        major: true,
+      })
+
+      // 필드 검사 후 잘못된 값이면 제출 처리를 중단한다.
+      const errors = validate()
+      // 오류 메세지 상태를 갱신한다
+      setErrors(errors)
+      // 잘못된 값이면 제출 처리를 중단한다.
+      if (Object.values(errors).some(v => v)) {
+        return
+      }
+      console.log("로그인중..")
+
+      setLoginSubmit(1)
+      
+      console.log("로그인중..")
+      await axios.post(process.env.FRONT_BASE_URL + "/api/crawl", {
+        studentId: values.stdid,
+        pwd: values.pwd
+      }, {
+        withCredentials: true
+      }).then((response) => {
+        console.log(response)
+        if(response.data.status == 'FAIL') {
+          alert("잘못된 학번 혹은 비밀번호입니다")
+          setLoginSubmit(0)
+          return
+        }
+        status = 1
+      }).catch((error) => {
+        console.log(error.response)
+        alert("ERROR!")
+        setLoginSubmit(0)
+        return
+      });
+
+      if(status != 1) return
+
+      await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-in", {
+        studentId: values.stdid,
+        userId: values.stdid,
+        pwd: values.pwd
+      }, {
+        withCredentials: true
+      }).then((response) => {
+        console.log(response)
+        if(response.data.student == 'new') {
+          status = 2
+          let retval = confirm("미등록된 사용자입니다.\n회원가입을 진행하시겠습니까?")
+          if(retval) {
+            setSignUpMode(1)
+          } else {
+            setLoginSubmit(0)
+          }
+        }
+      }).catch((error) => {
+        console.log(error.response)
+        alert("ERROR!")
+        setLoginSubmit(0)
+        status = 0
+        return
+      });
+      
+      if(status == 1) {
+        window.location.href=process.env.FRONT_BASE_URL+'/?stdid='+values.stdid+'&pwd='+values.pwd;
+      }
+    }
+
+    const handleSignUpSubmit = async e => {
+
+      e.preventDefault()
+
+      // 모든 필드에 방문했다고 표시한다.
+      setTouched({
+        stdid: true,
+        pwd: true,
+        name: true,
+        major: true,
+      })
+      // 필드 검사 후 잘못된 값이면 제출 처리를 중단한다.
+      const errors = validate()
+      // 오류 메세지 상태를 갱신한다
+      setErrors(errors)
+      console.log("회원가입중..", errors)
+
+      // 잘못된 값이면 제출 처리를 중단한다.
+      if (Object.values(errors).some(v => v)) {
+        return
+      }
+
+      setSignUpSubmit(1)
+      console.log("회원가입중..")
+
+      let retval = confirm("해당 정보로 회원가입을 진행합니다\n이름: "+values.name+"\n학부: "+values.major)
+      if(!retval) {
+        setSignUpMode(0)
+        return
+      }
+      
+      await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-up", {
+        studentId: values.stdid,
+        major: values.major,
+        studentName: values.name
+      }, {
+        withCredentials: true
+      }).then((response) => {
+        console.log(response)
+      }).catch((error) => {
+        console.log(error.response)
+        alert("ERROR!")
+        setSignUpSubmit(0)
+        return
+      });
+
+      window.location.href=process.env.FRONT_BASE_URL+'/?stdid='+values.stdid+'&pwd='+values.pwd;
+    }
+
+    const changeSelectCollege = (e) => {
+      setSelectedCollege(Number(e.target.value));
+      setSelectedDepart(0)
+    };
+    
+    const getCollegeSelectComponent = () => {
+      let collegeOption = [];
+      for(let i = 0; i < college.length; i++) {
+        collegeOption.push(
+          <option key={i} value={i}>{college[i]}</option>
+        );
+      }
+
+      return (
+        <select onChange={changeSelectCollege} name="college" id="collegeSelect" value={selectedCollege}>
+          {collegeOption}
+        </select>
+      )
+    };
+
+    const changeSelectDepart = (e) => {
+      setSelectedDepart(Number(e.target.value));
+      setValues({
+        ...values,
+        [e.target.name]: depart[selectedCollege][e.target.value],
+      })
+    };
+    
+    const getDepartSelectComponent = () => {
+      let departOption = [];
+      for(let i = 0; i < depart[selectedCollege].length; i++) {
+        departOption.push(
+          <option key={i} value={i}>{depart[selectedCollege][i]}</option>
+        );
+      }
+
+      return (
+        <select onChange={changeSelectDepart} name="major" id="departSelect" value={selectedDepart}>
+          {departOption}
+        </select>
+      )
+    };
+
     return (
       <form onSubmit={signUpMode==0?handleLoginSubmit:handleSignUpSubmit} className={loginstyles.login_form}>
         <div>
@@ -267,23 +314,20 @@ export default function Login() {
         ):""}
         {signUpMode==1?(
           <div>
-            <h4>학과/학부</h4>
-            <input
-              type="text"
-              name="major"
-              placeholder="비밀번호를 입력하세요"
-              value={values.major}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={signUpSubmit==1?"disabled":""}
-            />
-            {touched.major && errors.major && <h6>{errors.major}</h6>}
+            <div>
+              <h4>대학</h4>
+              {getCollegeSelectComponent()}
+            </div>
+            <div>
+              <h4>학과/학부</h4>
+              {getDepartSelectComponent()}
+            </div>
           </div>
         ):""}
         <button type="submit">{signUpMode==0?"로그인":"회원가입"}</button>
       </form>
     )
-  }, [loginSubmit, signUpSubmit, signUpMode])
+  }, [values, errors, touched, loginSubmit, signUpSubmit, signUpMode, selectedCollege, selectedDepart])
 
   return (
     <div ref={slideRef}>

@@ -9,39 +9,63 @@
   margin: 0;
 }
 
+.main_board {
+  display: flex;
+  width: 70rem;
+}
+
+@media (max-width:560px) {
+  .main_board {
+    width: 320px;
+  }
+}
+
+@media (min-width:560px) {
+  .main_board {
+    width: 540px;
+  }
+}
+
+@media (min-width:780px) {
+  .main_board {
+    width: 760px;
+  }  
+}
+
+@media (min-width:1080px) {
+  .main_board {
+    width: 1060px;
+  }  
+}
+
+
 .board_left {
   margin: 0;
-  width: 47.5%;
+  width: 50%;
   display: flex;
   flex-direction: column;
 }
 
 .board_right {
   margin: 0;
-  width: 47.5%;
+  width: 50%;
   display: flex;
   flex-direction: column;
 }
 
-.board_calendar {
-  background: white;
-  border: 0.1rem solid #aaaaaa;
-  border-radius: 0.75rem;
-  height: 50rem;
-  margin: 1rem;
-  overflow: none;
+@media (max-width:780px) {
+  .main_board {
+    flex-direction: column;
+  }
+  .board_left {
+    width: 100%;
+  }
+  .board_right {
+    width: 100%;
+  }
 }
 
-.board_notice {
-  background: white;
-  border: 0.1rem solid #aaaaaa;
-  border-radius: 0.75rem;
-  height: 26.75rem;
-  margin: 1rem;
-  overflow: none;
-}
-
-.board_lecture {
+.board_iframe {
   background: white;
   border: 0.1rem solid #aaaaaa;
   border-radius: 0.75rem;
@@ -49,17 +73,6 @@
   margin: 1rem;
   overflow: none;
 }
-
-.board_subject {
-  background: white;
-  border: 0.1rem solid #aaaaaa;
-  border-radius: 0.75rem;
-  height: 50rem;
-  margin: 1rem;
-  overflow: none;
-}
-
-
 
 .footer {
   display: flex;
