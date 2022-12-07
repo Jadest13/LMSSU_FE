@@ -37,8 +37,6 @@ export default function Lecture() {
       stdid: stdid,
       pwd: pwd,
     })
-
-    getLectureItems();
   }, [])
   
   useEffect(() => {
@@ -195,6 +193,8 @@ export default function Lecture() {
     startWeek.setDate(startWeek.getDate()+(selectedWeeks-1)*7)
     let endWeek = new Date(startWeek)
     endWeek.setDate(endWeek.getDate() + 7)
+
+    if(!userData.stdid || !userData.pwd) return ("");
 
     if(weeklySubjectList[selectedWeeks] === undefined) {
       getLectureItems();
