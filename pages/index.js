@@ -93,9 +93,9 @@ export default function Home() {
     
     if(!stdid || !pwd) {
       window.location.href=process.env.FRONT_BASE_URL+'/login';
+    } else {
+      getUserData(stdid, pwd)
     }
-
-    getUserData(stdid, pwd)
   }, [])
 
   const getUserData = async (stdid, pwd) => {

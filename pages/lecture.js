@@ -5,7 +5,7 @@ import MARQUEE from "react-fast-marquee";
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
 import axios from 'axios'
 
-let stdid, pwd;
+let stdid = "", pwd = "";
 let errcnt = 0;
 
 const slideRef = React.createRef();
@@ -17,6 +17,10 @@ export default function Lecture() {
 
   const [selectedWeeks, setSelectedWeeks] = useState(nowWeeks);
   const [weeklySubjectList, setWeeklySubjectList] = useState([]);
+  const [userData, setUserData] = useState({
+    stdid: "",
+    pwd: "",
+  })
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -29,6 +33,10 @@ export default function Lecture() {
         pwd = param[1]
       }
     }
+    setUserData({
+      stdid: stdid,
+      pwd: pwd,
+    })
 
     getLectureItems();
   }, [])
@@ -68,7 +76,7 @@ export default function Lecture() {
   }
   
   const deleteTodo = (id) => {
-    setSelectedWeeks(selectedWeeks)
+    console.log(id)
   }
 
   const getLectureTodoLists = (item) => {
@@ -79,7 +87,7 @@ export default function Lecture() {
           <h4>{subject}</h4>
           <hr/>
         </div>
-        {/* <img src="images/trash.png" onClick={deleteTodo(weeklySubjectList[selectedWeeks].)}></img> */}
+        <img src="images/trash.png" onClick={deleteTodo(idx)}></img>
       </div>
     );
     if(todoList.length == 0) {
