@@ -155,7 +155,7 @@ export default function Login() {
 
       if(status != 1) return
 
-      await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-in", {
+      await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-in", {
         studentId: values.stdid,
         userId: values.stdid,
         pwd: values.pwd
@@ -216,7 +216,7 @@ export default function Login() {
         return
       }
       
-      await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-up", {
+      await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-up", {
         studentId: values.stdid,
         major: values.major,
         studentName: values.name

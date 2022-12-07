@@ -100,7 +100,7 @@ export default function Lecture() {
   const getLectureItems = () => {
     const getApi = async () => {
       console.log("asd")
-      const REQ_URL = process.env.FRONT_BASE_URL+"/apis/list?week="+selectedWeeks
+      const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/list?week="+selectedWeeks
       let data
       let tmpList = weeklySubjectList.slice()
       console.log(stdid, pwd)

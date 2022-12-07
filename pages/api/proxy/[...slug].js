@@ -4,7 +4,7 @@ const proxy = createProxyMiddleware({
   target: process.env.BACK_BASE_URL,
   changeOrigin: true,    // for vhosted sites, changes host header to match to target's host
   secure: false,
-  pathRewrite: { "^/api/proxy": "" }, // remove `/api/proxy` prefix
+  pathRewrite: { "^/qwe/proxy": "" }, // remove `/api/proxy` prefix
 });
 
 export default function handler(req, res) {

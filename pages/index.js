@@ -88,7 +88,7 @@ export default function Home() {
   }, [])
 
   const getUserData = async () => {
-    await axios.post(process.env.FRONT_BASE_URL+"/apis/student/sign-in", {
+    await axios.post(process.env.FRONT_BASE_URL+"/backapi/student/sign-in", {
       studentId: stdid,
       userId: stdid,
       pwd: pwd
