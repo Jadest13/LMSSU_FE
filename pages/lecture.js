@@ -80,15 +80,15 @@ export default function Lecture() {
   }
 
   const getLectureTodoLists = (item) => {
-    //weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO = ["asdasd"]
+    //weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO = ["집가서 떡볶이 먹기"]
     let todoList = weeklySubjectList[selectedWeeks].weeksSubjectListDTO.subjectDTO[item].toDoDTO.map((subject, idx) => 
       <div key={"lectureTodoList"+idx} className={lecturestyles.lecture_todolist_content}>
-        <input className={lecturestyles.lecture_todolist_check} type="checkbox" name="check" id="GFG" value="1" defaultChecked />
         <div className={lecturestyles.lecture_todolist_title}>
+          <input className={lecturestyles.lecture_todolist_check} type="checkbox" name="check" id="GFG" value="1" defaultChecked />
           <h4>{subject}</h4>
-          <hr/>
+          <img src="images/trash.png" onClick={deleteTodo(idx)}/>
         </div>
-        <img src="images/trash.png" onClick={deleteTodo(idx)}/>
+        <hr/>
       </div>
     );
     if(todoList.length == 0) {
@@ -124,7 +124,7 @@ export default function Lecture() {
       console.log("LETSGO")
       await axios.post(REQ_URL, {
         studentId: stdid,
-        userId: 0,
+        userId: stdid,
         pwd: pwd
       }, {
         withCredentials: true
