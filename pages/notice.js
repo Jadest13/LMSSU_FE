@@ -13,6 +13,7 @@ if (typeof window !== "undefined") {
 }
 
 let stdid, pwd;
+let errcnt = 0;
 let noticeList = [];
 
 export default function Notice() {
@@ -55,8 +56,9 @@ export default function Notice() {
             console.log(error.response)
           }).catch((error) => {
             console.log(error.response)
-            if(error.response.status == 404) {
-              window.location.href=process.env.FRONT_BASE_URL+'/asd';
+            errcnt++
+            if(errcnt >= 3) {
+              window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
             }
           })
         }

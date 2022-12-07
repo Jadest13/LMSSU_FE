@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from
 import axios from 'axios'
 
 let stdid, pwd;
+let errcnt = 0;
 
 const slideRef = React.createRef();
 
@@ -117,8 +118,9 @@ export default function Lecture() {
         console.log(tmpList)
       }).catch((error) => {
         console.log(error.response)
-        if(error.response.status == 404) {
-          window.location.href=process.env.FRONT_BASE_URL+'/asd';
+        errcnt++
+        if(errcnt >= 3) {
+          window.location.href=process.env.FRONT_BASE_URL+'/errorPage?error='+error.response.status;
         }
       });
 

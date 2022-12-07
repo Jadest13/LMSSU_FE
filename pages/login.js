@@ -82,7 +82,6 @@ export default function Login() {
 
   const LoginForm = useCallback(() => {
     const handleChange = e => {
-      console.log(e.target.value)
       setValues({
         ...values,
         [e.target.name]: e.target.value,
@@ -123,6 +122,7 @@ export default function Login() {
       setLoginSubmit(1)
       
       console.log("로그인중..")
+
       await axios.post(process.env.FRONT_BASE_URL + "/api/crawl", {
         studentId: values.stdid,
         pwd: values.pwd

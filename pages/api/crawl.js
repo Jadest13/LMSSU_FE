@@ -1,4 +1,3 @@
-
 import puppeteer from 'puppeteer'
 
 export default async function handler(req, res) {
@@ -31,8 +30,10 @@ export default async function handler(req, res) {
     })
 
     if(page.url() === 'https://class.ssu.ac.kr/'){
+      await browser.close();
       res.status(200).json({ id: ndhs_id, pwd: ndhs_pw, status: "OK" })
     } else {
+      await browser.close();
       res.status(200).json({ id: ndhs_id, pwd: ndhs_pw, status: "FAIL" })
     }
   }

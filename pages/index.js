@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import axios from 'axios'
 
 let stdid, pwd;
+let errcnt = 0;
 
 if (typeof window !== "undefined") {
   window.onload = () => {

@@ -3,6 +3,8 @@ import Image from 'next/image'
 import calendarstyles from '../styles/Calendar.module.css'
 import React, { useEffect, useRef, useLayoutEffect, useState, useCallback } from "react";
 
+let errcnt = 0;
+
 if (typeof window !== "undefined") {
   window.onload = () => {
   }
