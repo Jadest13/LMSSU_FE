@@ -6,7 +6,7 @@ import headerstyles from '../styles/Header.module.css'
 import React, { useCallback, useEffect, useState } from "react";
 import axios from 'axios'
 
-let stdid, pwd;
+let stdid = "", pwd = "";
 let errcnt = 0;
 
 if (typeof window !== "undefined") {
@@ -79,22 +79,19 @@ export default function Home() {
 
     for(const param of searchParams) {
       if(param[0] == 'stdid') {
-        setUserData({
-          ...userData,
-          stdid: param[1],
-        })
         stdid = param[1]
       }
       if(param[0] == 'pwd') {
-        setUserData({
-          ...userData,
-          pwd: param[1],
-        })
         pwd = param[1]
       }
     }
+    setUserData({
+      ...userData,
+      stdid: stdid,
+      pwd: pwd,
+    })
     
-    if(userData.stdid === undefined || userData.pwd === undefined) {
+    if(!stdid || !pwd) {
       window.location.href=process.env.FRONT_BASE_URL+'/login';
     }
 
@@ -123,23 +120,34 @@ export default function Home() {
       })
     }).catch((error) => {
       console.log(error.response)
+      setUserData({
+        ...userData,
+        status: "error",
+      })
       return
     });
   }
 
   const getUserDataComponent = useCallback(() => {
     console.log(userData)
-    return (
-      <div>
-        <p>{userData.major}</p>
-        <p>{userData.stdid}</p>
-        <p>{userData.name}</p>
-      </div>
-    )
+    if(userData.status != "original") {
+      return ("");
+    } else {
+      return (
+        <div>
+          <p>{userData.major}</p>
+          <p>{userData.stdid}</p>
+          <p>{userData.name}</p>
+        </div>
+      )
+    }
   }, [userData])
 
   const getMainBoard = useCallback(() => {
-    if(!userData.stdid) {
+    if(userData.status != "original") {
+      if(userData.status == "error") {
+        window.location.href=process.env.FRONT_BASE_URL+'/login';
+      }
       return ("");
     } else {
       return (
