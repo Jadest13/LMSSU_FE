@@ -4,6 +4,7 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     const { studentId, pwd } = req.body;
+    res.status(200).json({ id: studentId, pwd: pwd, status: "OK" })
     console.log(req.body)
 
     const browser = await puppeteer.launch({headless: true});
