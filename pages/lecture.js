@@ -122,11 +122,13 @@ export default function Lecture() {
       if(listLoading[selectedWeeks-1] == 1) return;
       listLoading[selectedWeeks-1] = 1;
       console.log("LETSGO")
+      
       await axios.post(REQ_URL, {
         studentId: stdid,
         userId: stdid,
         pwd: pwd
       }, {
+        timeout: 90000,
         withCredentials: true
       }).then((response) => {
         data = response.data
