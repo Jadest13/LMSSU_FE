@@ -40,6 +40,7 @@ export default function Lecture() {
   }, [])
   
   useEffect(() => {
+    console.log("helloasdasdasdasdsad");
     const slideHeight = slideRef && slideRef.current && slideRef.current.offsetHeight;
     console.log(slideHeight)
     window.parent.postMessage({ head: "changeHeight", body: {view: "Lecture", height: slideHeight } }, '*');
@@ -199,8 +200,6 @@ export default function Lecture() {
     if(weeklySubjectList[selectedWeeks] === undefined) {
       getLectureItems();
     }
-
-    if(userData)
 
     return (
       <div className={lecturestyles.lecture_board}>
