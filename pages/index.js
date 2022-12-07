@@ -54,7 +54,7 @@ const changeHeight = (obj) => {
 const GetMessage = () => {
   useEffect(() => {
     window.addEventListener("message", (e) => {
-      if (e.origin === process.env.FRONT_BASE_URL && e.data) {
+      if (e.data) {
         if(e.data.head === "changeHeight") {
           changeHeight(e.data.body);
         }
