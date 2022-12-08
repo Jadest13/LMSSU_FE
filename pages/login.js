@@ -310,6 +310,23 @@ export default function Login() {
     )
   }, [values, errors, touched, loginSubmit, signUpSubmit, signUpMode, selectedCollege, selectedDepart])
 
+  const loadingComponent = useCallback(() => {
+    if((loginSubmit && !signUpMode) || signUpSubmit) {
+      return (
+        <div className={loginstyles.loading_main}>
+          <div className={loginstyles.loading_container}>
+            <div className={loginstyles.loading}></div>
+            <div className={loginstyles.loading_text}>Loggin in...</div>
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        ""
+      )
+    }
+  }, [loginSubmit, signUpMode, signUpSubmit])
+
   return (
     <div ref={slideRef}>
       <Head>
@@ -319,6 +336,7 @@ export default function Login() {
       </Head>
 
       <main>
+        {loadingComponent()}
         <div className={loginstyles.login_board}>
           <h2>LMSSU:로그인</h2>
           {LoginForm()}

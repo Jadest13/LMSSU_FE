@@ -76,6 +76,11 @@ export default function Subject() {
           else if(item.contentsType == "mp4") img_src += "play-button.png"
           else if(item.contentsType == "pdf") img_src += "pdf.png"
           else if(item.contentsType == "text") img_src += "text.png"
+          else if(item.contentsType == "file") img_src += "file.png"
+          else if(item.contentsType == "offline_attendance") img_src += "lecture.png"
+          else if(item.contentsType == "zoom") img_src += "zoom.png"
+          else if(item.contentsType == "video_conference") img_src += "video.png"
+          else if(item.contentsType == "readystream") img_src += "play-button.png"
 
           let dday = parseInt((new Date(item.endDate).getTime() - new Date().getTime())/(1000*60*60*24))
 
@@ -142,7 +147,7 @@ export default function Subject() {
 
       <main>
         <div className={subjectstyles.subject_board}>
-          <h2>미완료 강의</h2>
+          <h2>마감임박 강의/과제</h2>
           {getSubjectList()}
         </div>
       </main>

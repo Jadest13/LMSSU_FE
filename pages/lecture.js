@@ -107,6 +107,8 @@ export default function Lecture() {
     let content = prompt("TO-DO LIST를 입력해주세요");
     if(!content) return
 
+    if(listLoading[selectedWeeks]) return;
+    listLoading[selectedWeeks] = 1;
     const REQ_URL = process.env.FRONT_BASE_URL+"/backapi/list/todo"
     await axios.post(REQ_URL, {
       studentId: stdid,
